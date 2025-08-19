@@ -1,0 +1,6 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata: { name: devopssemfirula, namespace: apps }
+spec:
+  selector: { matchLabels: { app: devopssemfirula } }
+  endpoints: [ { port: http, path: /healthz } ]

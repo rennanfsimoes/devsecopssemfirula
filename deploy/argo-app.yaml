@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: { name: devopssemfirula, namespace: argocd }
+spec:
+  destination: { namespace: apps, server: https://kubernetes.default.svc }
+  source:
+    repoURL: https://github.com/YOUR_ORG/devopssemfirula.git
+    targetRevision: main
+    path: deploy/helm
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [ "CreateNamespace=true" ]

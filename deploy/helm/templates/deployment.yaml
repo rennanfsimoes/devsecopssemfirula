@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: devopssemfirula, namespace: apps }
+spec:
+  replicas: 3
+  selector: { matchLabels: { app: devopssemfirula } }
+  template:
+    metadata: { labels: { app: devopssemfirula } }
+    spec:
+      containers:
+        - name: devopssemfirula
+          image: "ghcr.io/YOUR_ORG/devopssemfirula:latest"
+          ports: [ { containerPort: 3000 } ]
+          readinessProbe: { httpGet: { path: /healthz, port: 3000 }, initialDelaySeconds: 5, periodSeconds: 5 }

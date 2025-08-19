@@ -1,0 +1,6 @@
+image:
+  repository: ghcr.io/YOUR_ORG/devopssemfirula
+  tag: "latest"
+  pullPolicy: IfNotPresent
+replicaCount: 3
+service: { type: ClusterIP, port: 80 }

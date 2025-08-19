@@ -1,0 +1,66 @@
+{{- if .Values.rollouts.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: apps
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    canary:
+      canaryService: {{ .Chart.Name }}-canary
+      stableService: {{ .Chart.Name }}
+      trafficRouting:
+        # Ajuste para o seu ingress controller (nginx/istio/ambassador)
+        nginx: {}
+      steps:
+{{ toYaml .Values.rollouts.canarySteps | indent 8 }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet: { path: /healthz, port: 3000 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+{{- else }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: apps
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet: { path: /healthz, port: 3000 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+{{- end }}
